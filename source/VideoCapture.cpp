@@ -1,52 +1,70 @@
 #include "../header/VideoCapture.h"
 
-#include <opencv2/opencv.hpp>
-#include <iostream>
-#include <opencv2/objdetect.hpp>
-
 using namespace cv;
 using namespace std;
 
-void playVideo()
+void detectAndDisplay(Mat frame, CascadeClassifier faceCascade)
 {
-    //open the video file for reading
-    VideoCapture cap("C:/ResourcesCV/eblan.mp4");
+    std::vector<Rect> faces;
+    Mat frameGray;
 
-    // if not success, exit program
-    if (cap.isOpened() == false)
+    cvtColor(frame, frameGray, COLOR_BGR2GRAY);
+    equalizeHist(frameGray, frameGray);
+
+    faceCascade.detectMultiScale(frameGray, faces, 1.1, 10, 0 | CASCADE_SCALE_IMAGE, Size(30, 30));
+
+    for (size_t i = 0; i < faces.size(); i++)
     {
-        cout << "Cannot open the video file" << endl;
-        cin.get(); //wait for any key press
+        Point center(faces[i].x + faces[i].width / 2, faces[i].y + faces[i].height / 2);
+        ellipse(frame, center, Size(faces[i].width / 2, faces[i].height / 2), 0, 0, 360, Scalar(255, 0, 255), 2);
     }
 
-    double fps = cap.get(CAP_PROP_FPS);
-    cout << "Frames per seconds : " << fps << endl;
+    imshow("Capture - Face detection", frame);
+}
 
-    String window_name = "My First Video";
+void faceDetRealtime()
+{
+    VideoCapture cap(0);
 
-    namedWindow(window_name, WINDOW_NORMAL); //create a window
+    if (!cap.isOpened())
+    {
+        cout << "Cannot open the video camera" << endl;
+        return;
+    }
+
+    CascadeClassifier faceCascade;
+    if (!faceCascade.load("C:/ResourcesCV/haarcascade_frontalface_default.xml"))
+    {
+        cout << "Error loading face cascade file" << endl;
+        return;
+    }
+
+    String window_name = "Face Detection in Real-Time";
+    namedWindow(window_name, WINDOW_NORMAL);
 
     while (true)
     {
         Mat frame;
-        bool bSuccess = cap.read(frame); // read a new frame from video 
+        bool bSuccess = cap.read(frame);
 
-        //Breaking the while loop at the end of the video
-        if (bSuccess == false)
+        if (!bSuccess)
         {
-            cout << "Found the end of the video" << endl;
+            cout << "Video camera is disconnected" << endl;
             break;
         }
 
-        //show the frame in the created window
-        imshow(window_name, frame);
-
-        if (waitKey(10) == 27)
+        if (frame.empty())
         {
-            cout << "Esc key is pressed by user. Stoppig the video" << endl;
+            cout << "No captured frame" << endl;
+            break;
+        }
+
+        detectAndDisplay(frame, faceCascade);
+
+        if (waitKey(10) == 27) // ESC key to exit
+        {
+            cout << "ESC key is pressed by user. Exiting the program" << endl;
             break;
         }
     }
-
-
 }

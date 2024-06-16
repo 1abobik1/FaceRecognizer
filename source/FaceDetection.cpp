@@ -6,12 +6,17 @@
 
 using namespace cv;
 
-void faceSearch()
+void faceDet()
 {
-	Mat image = imread("C:/ResourcesCV/dvoe2.jpg");
+	Mat image = imread("C:/ResourcesCV/sobaki.jpg");
+
+	if (image.empty()) {
+		std::cout << "не правильно указан путь.." << std::endl;
+	}
 
 	CascadeClassifier faceCascade;
 	faceCascade.load("C:/ResourcesCV/haarcascade_frontalface_default.xml");
+	//faceCascade.load("C:/ResourcesCV/haarcascade_eye.xml");
 
 	if (faceCascade.empty()) {
 		std::cout << "xml file not loaded.." << std::endl;
@@ -22,7 +27,7 @@ void faceSearch()
 	faceCascade.detectMultiScale(image, faces, 1.1, 10);
 
 	for (int i = 0; i < faces.size(); ++i) {
-		rectangle(image,faces[i].tl(), faces[i].br(), Scalar(0, 0, 255), 2);
+		rectangle(image,faces[i].tl(), faces[i].br(), Scalar(0, 0, 255),3);
 	}
 
 	String imageName = "human";
@@ -30,3 +35,5 @@ void faceSearch()
 	imshow(imageName, image);
 	waitKey(0);
 }
+
+
