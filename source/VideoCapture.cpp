@@ -3,20 +3,20 @@
 using namespace cv;
 using namespace std;
 
-void detectAndDisplay(Mat frame, CascadeClassifier faceCascade)
+void detectAndDisplay(const Mat& frame,CascadeClassifier& faceCascade)
 {
-    std::vector<Rect> faces;
-    Mat frameGray;
+    std::vector<Rect> faces; // Вектор для хранения обнаруженных лиц
+    Mat frameGray; // Матрица для хранения кадра в оттенках серого
 
-    cvtColor(frame, frameGray, COLOR_BGR2GRAY);
-    equalizeHist(frameGray, frameGray);
+    cvtColor(frame, frameGray, COLOR_BGR2GRAY); // Преобразование кадра в оттенки серого
+    equalizeHist(frameGray, frameGray); // Выравнивание гистограммы для улучшения контрастности
 
-    faceCascade.detectMultiScale(frameGray, faces, 1.1, 10, 0 | CASCADE_SCALE_IMAGE, Size(30, 30));
+    faceCascade.detectMultiScale(frameGray, faces, 1.1, 10, 0 | CASCADE_SCALE_IMAGE, Size(30, 30)); // Обнаружение лиц
 
     for (size_t i = 0; i < faces.size(); i++)
     {
-        Point center(faces[i].x + faces[i].width / 2, faces[i].y + faces[i].height / 2);
-        ellipse(frame, center, Size(faces[i].width / 2, faces[i].height / 2), 0, 0, 360, Scalar(255, 0, 255), 2);
+        Point center(faces[i].x + faces[i].width / 2, faces[i].y + faces[i].height / 2); // Центр лица
+        ellipse(frame, center, Size(faces[i].width / 2, faces[i].height / 2), 0, 0, 360, Scalar(0, 0, 255), 2); // Рисование эллипса вокруг лица
     }
 
     imshow("Capture - Face detection", frame);
@@ -39,7 +39,7 @@ void faceDetRealtime()
         return;
     }
 
-    String window_name = "Face Detection in Real-Time";
+    String window_name = "ShakalKamera";
     namedWindow(window_name, WINDOW_NORMAL);
 
     while (true)
@@ -61,7 +61,7 @@ void faceDetRealtime()
 
         detectAndDisplay(frame, faceCascade);
 
-        if (waitKey(10) == 27) // ESC key to exit
+        if (waitKey(10) == 27) // 27 its ESC key to exit
         {
             cout << "ESC key is pressed by user. Exiting the program" << endl;
             break;

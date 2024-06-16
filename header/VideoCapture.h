@@ -5,6 +5,6 @@
 #include <opencv2/objdetect.hpp>
 
 
-void detectAndDisplay(cv::Mat frame, cv::CascadeClassifier faceCascade);
+void detectAndDisplay(const cv::Mat& frame,cv::CascadeClassifier& faceCascade);
 
 void faceDetRealtime();
