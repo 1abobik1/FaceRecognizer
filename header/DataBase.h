@@ -2,13 +2,13 @@
 
 #include <libpq-fe.h>
 
-#include <string_view>
-#include <string>
-#include <libpq-fe.h>
-#include <memory>
-#include <set>
 #include <opencv2/core/base.hpp>
 #include <opencv2/core/mat.hpp>
+
+#include <string_view>
+#include <string>
+#include <memory>
+#include <set>
 
 constexpr std::string_view CONNECTION_DB = "host=localhost dbname=face_DB user=postgres password=Zopa_kek12";
 
@@ -30,6 +30,8 @@ public:
 
 };
 
+class UserTable;
+
 class Database {
 private:
     static Database* instance_;
@@ -47,6 +49,7 @@ public:
 
     UserTable* getUserTable() const;
 };
+
 
 class UserTable {
 private:

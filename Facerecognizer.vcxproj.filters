@@ -18,18 +18,24 @@
     <ClCompile Include="main.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="source\VideoCapture.cpp">
+    <ClCompile Include="source\FaceDetection.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="source\FaceDetection.cpp">
+    <ClCompile Include="source\DataBase.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="source\FaceRecognition.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="header\VideoCapture.h">
+    <ClInclude Include="header\FaceDetection.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="header\FaceDetection.h">
+    <ClInclude Include="header\DataBase.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="header\FaceRecognition.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
