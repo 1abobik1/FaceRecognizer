@@ -1,10 +1,8 @@
 #pragma once
 
 #include <libpq-fe.h>
-
 #include <opencv2/core/base.hpp>
 #include <opencv2/core/mat.hpp>
-
 #include <string_view>
 #include <string>
 #include <memory>
@@ -18,16 +16,9 @@ private:
     PGconn* connection_;
 
 public:
-
     DBConnection();
-
     ~DBConnection();
-
-    operator PGconn* () const
-    {
-        return connection_;
-    }
-
+    operator PGconn* () const { return connection_; }
 };
 
 class UserTable;
@@ -50,7 +41,6 @@ public:
     UserTable* getUserTable() const;
 };
 
-
 class UserTable {
 private:
     DBConnection connection_;
@@ -58,7 +48,6 @@ private:
 
     friend Database;
 public:
-    std::vector<cv::Mat> loadFacesFromDB(std::vector<int>& labels);
-
-    void saveFaceToDB(const cv::Mat& face, const std::string& name, const std::string& surname);
+    int getUserID(const std::string& name, const std::string& surname);
+    void addUserToDB(const std::string& name, const std::string& surname);
 };

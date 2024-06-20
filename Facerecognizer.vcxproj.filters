@@ -18,7 +18,7 @@
     <ClCompile Include="main.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="source\FaceDetection.cpp">
+    <ClCompile Include="source\FaceModelTrainer.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="source\DataBase.cpp">
@@ -29,7 +29,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="header\FaceDetection.h">
+    <ClInclude Include="header\FaceModelTrainer.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="header\DataBase.h">
