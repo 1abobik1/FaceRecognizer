@@ -20,12 +20,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="source\DataBase.cpp" />
+    <ClCompile Include="source\FileOperations.cpp" />
     <ClCompile Include="source\FaceRecognition.cpp" />
     <ClCompile Include="source\FaceModelTrainer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="header\DataBase.h" />
+    <ClInclude Include="header\FileOperations.h" />
     <ClInclude Include="header\FaceRecognition.h" />
     <ClInclude Include="header\FaceModelTrainer.h" />
   </ItemGroup>

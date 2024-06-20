@@ -4,9 +4,9 @@
 
 class FaceRecognition {
 private:
-	FaceModelTrainer* faceModel_;
+    FaceModelTrainer* faceModel_;
 public:
-	FaceRecognition(FaceModelTrainer* faceModel) : faceModel_(faceModel) {}
+    FaceRecognition(FaceModelTrainer* modelTrainer);
 
-	void faceRecognition();
+    void recognizeFaces();
 };

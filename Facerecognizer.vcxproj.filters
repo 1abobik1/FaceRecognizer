@@ -21,10 +21,10 @@
     <ClCompile Include="source\FaceModelTrainer.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="source\DataBase.cpp">
+    <ClCompile Include="source\FaceRecognition.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="source\FaceRecognition.cpp">
+    <ClCompile Include="source\FileOperations.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>
@@ -32,10 +32,10 @@
     <ClInclude Include="header\FaceModelTrainer.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="header\DataBase.h">
+    <ClInclude Include="header\FaceRecognition.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="header\FaceRecognition.h">
+    <ClInclude Include="header\FileOperations.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,35 +1,29 @@
-#include <opencv2/opencv.hpp>
-#include <opencv2/face.hpp>
-
-#include <libpq-fe.h>
-
-#include <iostream>
-#include <fstream>
-
-#include "../header/DataBase.h"
 #include "../header/FaceRecognition.h"
+#include <opencv2/highgui.hpp>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/objdetect.hpp>
+#include <iostream>
 
 using namespace cv;
 using namespace cv::face;
 using namespace std;
 
-void FaceRecognition::faceRecognition() {
+FaceRecognition::FaceRecognition(FaceModelTrainer* modelTrainer) : faceModel_(modelTrainer) {}
 
+
+void FaceRecognition::recognizeFaces() {
     VideoCapture cap(0);
     if (!cap.isOpened()) {
-        cout << "Cannot open the video camera" << endl;
+        cout << "Cannot open the video camera\n";
         return;
     }
 
     CascadeClassifier faceCascade;
-    if (!faceCascade.load("C:/Users/dima1/source/repos/Facerecognizer/ResourcesCV/haarcascade_frontalface_default.xml")) {
+    if (!faceCascade.load("C:/Users/dima1/source/repos/Facerecognizer/haarcascades/haarcascade_frontalface_default.xml")) {
         cout << "Error loading face cascade file" << endl;
         return;
     }
-
-    cv::Ptr<cv::face::LBPHFaceRecognizer> model = faceModel_->getModel();
-    model->read("C:/Users/dima1/source/repos/Facerecognizer/ResourcesCV/face_model.xml");
-
+    auto models = faceModel_->getModels();
     string window_name = "Face Recognition";
     namedWindow(window_name, WINDOW_NORMAL);
 
@@ -37,7 +31,7 @@ void FaceRecognition::faceRecognition() {
         Mat frame;
         bool bSuccess = cap.read(frame);
         if (!bSuccess) {
-            cout << "Video camera is disconnected" << endl;
+            cout << "Video camera is disconnected\n";
             break;
         }
 
@@ -50,15 +44,22 @@ void FaceRecognition::faceRecognition() {
 
         for (size_t i = 0; i < faces.size(); i++) {
             Mat faceROI = frameGray(faces[i]);
-            int label;
-            double confidence;
-            model->predict(faceROI, label, confidence);
 
-            if (confidence < 50) {
-                cout << "Recognized ID: " << label << " with confidence(max50): " << confidence << endl;
+            bool recognized = false;
+            for (const auto& model : models) {
+                int label;
+                double confidence;
+                model->predict(faceROI, label, confidence);
+
+                if (confidence < 50) {
+                    cout << "Recognized ID: " << label << " with confidence: " << confidence << '\n';
+                    recognized = true;
+                    break;
+                }
             }
-            else {
-                cout << "Face not recognized." << endl;
+
+            if (!recognized) {
+                cout << "Face not recognized.\n";
             }
 
             Point center(faces[i].x + faces[i].width / 2, faces[i].y + faces[i].height / 2);
@@ -68,7 +69,7 @@ void FaceRecognition::faceRecognition() {
         imshow(window_name, frame);
 
         if (waitKey(10) == 27) {
-            cout << "ESC key is pressed by user. Exiting the program" << endl;
+            cout << "ESC key is pressed by user. Exiting the program\n";
             break;
         }
     }
