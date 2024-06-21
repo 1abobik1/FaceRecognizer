@@ -69,10 +69,12 @@ void FaceModelTrainer::addFace(const cv::Mat& face, int label) {
     labels_.push_back(label);
 }
 
-void FaceModelTrainer::updateModel(const cv::String& modelFileName,const int label)
+void FaceModelTrainer::updateModel(const cv::String& modelFileName)
 {
-    models_[label]->update(images_, labels_);
-    models_[label]->save(modelFileName);
+    cv::Ptr<cv::face::LBPHFaceRecognizer> model = cv::face::LBPHFaceRecognizer::create();
+
+    model->update(images_, labels_);
+    model->save(modelFileName);
 }
 
 void FaceModelTrainer::trainNewModel(const std::string& modelFileName) {
