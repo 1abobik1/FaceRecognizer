@@ -39,8 +39,16 @@ bool checkXMLFileExists(const std::string& pathToFile) {
 std::vector<cv::String> getFaceModelsFiles(const std::string& path)
 {
     std::vector<cv::String> filesFaceModels;
-    for (const auto& entry : fs::directory_iterator(path))
-        filesFaceModels.push_back(entry.path().string());
+    if (!fs::is_directory(path)) {
+        return filesFaceModels;
+    }
+    for (const auto& entry : fs::directory_iterator(path)) {
+        const std::string name = entry.path().filename().string();
+        const bool isModel = entry.is_regular_file() && name.starts_with(FILE_NAME) && name.ends_with(".xml");
+        if (isModel) {
+            filesFaceModels.push_back(entry.path().string());
+        }
+    }
     return filesFaceModels;
 }
 
