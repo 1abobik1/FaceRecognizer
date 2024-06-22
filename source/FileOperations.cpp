@@ -13,14 +13,14 @@ void createFolder(const std::string& folderPath)
         bool created = fs::create_directory(faceModelsPath);
 
         if (created) {
-            std::cout << "Ïàïêà óñïåøíî ñîçäàíà.\n";
+            std::cout << "ÐŸÐ°Ð¿ÐºÐ° ÑƒÑÐ¿ÐµÑˆÐ½Ð¾ ÑÐ¾Ð·Ð´Ð°Ð½Ð°.\n";
         }
         else {
-            std::cout << "Îøèáêà ïðè ñîçäàíèè ïàïêè.\n";
+            std::cout << "ÐžÑˆÐ¸Ð±ÐºÐ° Ð¿Ñ€Ð¸ ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ð¸ Ð¿Ð°Ð¿ÐºÐ¸.\n";
         }
     }
     else {
-        std::cout << "Ïàïêà óæå ñóùåñòâóåò.\n";
+        std::cout << "ÐŸÐ°Ð¿ÐºÐ° ÑƒÐ¶Ðµ ÑÑƒÑ‰ÐµÑÑ‚Ð²ÑƒÐµÑ‚.\n";
     }
     std::cout << '\n';
 }
@@ -31,18 +31,18 @@ void createXMLFile(const std::string& newFile, const int label)
 
     fs::path directory = fs::path(path).parent_path();
     if (!fs::exists(directory)) {
-        std::cerr << "Äèðåêòîðèÿ íå ñóùåñòâóåò.\n";
+        std::cerr << "Ð”Ð¸Ñ€ÐµÐºÑ‚Ð¾Ñ€Ð¸Ñ Ð½Ðµ ÑÑƒÑ‰ÐµÑÑ‚Ð²ÑƒÐµÑ‚.\n";
         return;
     }
 
     std::ofstream xmlFile(path);
 
     if (!xmlFile) {
-        std::cerr << "Íå óäàëîñü ñîçäàòü ôàéë.\n";
+        std::cerr << "ÐÐµ ÑƒÐ´Ð°Ð»Ð¾ÑÑŒ ÑÐ¾Ð·Ð´Ð°Ñ‚ÑŒ Ñ„Ð°Ð¹Ð».\n";
         return;
     }
     xmlFile.close();
-    std::cout << "XML ôàéë óñïåøíî ñîçäàí ïî ïóòè " << path << ".\n";
+    std::cout << "XML Ñ„Ð°Ð¹Ð» ÑƒÑÐ¿ÐµÑˆÐ½Ð¾ ÑÐ¾Ð·Ð´Ð°Ð½ Ð¿Ð¾ Ð¿ÑƒÑ‚Ð¸ " << path << ".\n";
 }
 
 bool checkXMLFileExists(const std::string& pathToFile) {
