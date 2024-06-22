@@ -4,10 +4,15 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/objdetect.hpp>
 #include <iostream>
+#include <limits>
 
 using namespace cv;
 using namespace cv::face;
 using namespace std;
+
+namespace {
+constexpr double kRecognitionThreshold = 50.0;
+}
 
 FaceRecognition::FaceRecognition(FaceModelTrainer* modelTrainer) : faceModel_(modelTrainer) {}
 
@@ -44,20 +49,23 @@ void FaceRecognition::recognizeFaces() {
         for (size_t i = 0; i < faces.size(); i++) {
             Mat faceROI = preprocessFace(frameGray, faces[i]);
 
-            bool recognized = false;
+            // LBPH returns a distance: the lower, the more similar. Pick the closest person,
+            // not the first model that passes the threshold.
+            int bestLabel = -1;
+            double bestDistance = std::numeric_limits<double>::max();
             for (const auto& model : models) {
-                int label;
-                double confidence;
-                model->predict(faceROI, label, confidence);
-
-                if (confidence < 50) {
-                    cout << "Recognized ID: " << label << " with confidence: " << confidence << '\n';
-                    recognized = true;
-                    break;
+                int label = -1;
+                double distance = 0.0;
+                model->predict(faceROI, label, distance);
+                if (distance < bestDistance) {
+                    bestDistance = distance;
+                    bestLabel = label;
                 }
             }
 
-            if (!recognized) {
+            if (bestLabel != -1 && bestDistance < kRecognitionThreshold) {
+                cout << "Recognized ID: " << bestLabel << " with distance: " << bestDistance << '\n';
+            } else {
                 cout << "Face not recognized.\n";
             }
 
