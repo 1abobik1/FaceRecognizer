@@ -1,4 +1,5 @@
 #include "facerec/FaceRecognition.hpp"
+#include "facerec/Preprocess.hpp"
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/objdetect.hpp>
@@ -35,15 +36,13 @@ void FaceRecognition::recognizeFaces() {
             break;
         }
 
-        Mat frameGray;
-        cvtColor(frame, frameGray, COLOR_BGR2GRAY);
-        equalizeHist(frameGray, frameGray);
+        Mat frameGray = toEqualizedGray(frame);
 
         vector<Rect> faces;
         faceCascade.detectMultiScale(frameGray, faces, 1.1, 10, 0 | CASCADE_SCALE_IMAGE, Size(30, 30));
 
         for (size_t i = 0; i < faces.size(); i++) {
-            Mat faceROI = frameGray(faces[i]);
+            Mat faceROI = preprocessFace(frameGray, faces[i]);
 
             bool recognized = false;
             for (const auto& model : models) {

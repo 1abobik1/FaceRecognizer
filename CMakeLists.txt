@@ -17,6 +17,7 @@ add_executable(facerec
     src/FaceModelTrainer.cpp
     src/FaceRecognition.cpp
     src/FileOperations.cpp
+    src/Preprocess.cpp
 )
 
 target_include_directories(facerec PRIVATE include ${OpenCV_INCLUDE_DIRS})

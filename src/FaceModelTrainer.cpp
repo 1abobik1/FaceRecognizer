@@ -1,4 +1,5 @@
 #include "facerec/FaceModelTrainer.hpp"
+#include "facerec/Preprocess.hpp"
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 #include <iostream>
@@ -29,12 +30,13 @@ void FaceModelTrainer::captureAndAddFace(int label) {
             break;
         }
 
+        cv::Mat gray = toEqualizedGray(frame);
         std::vector<cv::Rect> faces;
-        faceCascade.detectMultiScale(frame, faces, 1.1, 10, 0 | cv::CASCADE_SCALE_IMAGE, cv::Size(30, 30));
+        faceCascade.detectMultiScale(gray, faces, 1.1, 10, 0 | cv::CASCADE_SCALE_IMAGE, cv::Size(30, 30));
 
         for (size_t i = 0; i < faces.size(); i++) {
-            // clone(): the ROI shares memory with frame, and the ellipse below is drawn on frame
-            capturedFaces.push_back(frame(faces[i]).clone());
+            // taken from gray (a separate buffer), so the ellipse drawn on frame does not leak in
+            capturedFaces.push_back(preprocessFace(gray, faces[i]));
             cv::Point center(faces[i].x + faces[i].width / 2, faces[i].y + faces[i].height / 2);
             cv::ellipse(frame, center, cv::Size(faces[i].width / 2, faces[i].height / 2), 0, 0, 360, cv::Scalar(0, 0, 255), 2);
             count++;
@@ -53,12 +55,7 @@ void FaceModelTrainer::captureAndAddFace(int label) {
 }
 
 void FaceModelTrainer::addFace(const cv::Mat& face, int label) {
-    cv::Mat gray;
-
-    cv::cvtColor(face, gray, cv::COLOR_BGR2GRAY);
-    cv::equalizeHist(gray, gray);
-
-    images_.push_back(gray);
+    images_.push_back(face);
     labels_.push_back(label);
 }
 
