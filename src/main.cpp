@@ -4,9 +4,9 @@
 #include <string>
 #include <string_view>
 
-#include "header/FaceRecognition.h"
-#include "header/FaceModelTrainer.h"
-#include "header/FileOperations.h"
+#include "facerec/FaceRecognition.hpp"
+#include "facerec/FaceModelTrainer.hpp"
+#include "facerec/FileOperations.hpp"
 
 static void setLogLevel() {
     cv::utils::logging::setLogLevel(cv::utils::logging::LOG_LEVEL_ERROR);

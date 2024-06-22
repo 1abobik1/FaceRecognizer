@@ -1,6 +1,6 @@
 #pragma once
 
-#include "FaceModelTrainer.h"
+#include "facerec/FaceModelTrainer.hpp"
 
 class FaceRecognition {
 private:

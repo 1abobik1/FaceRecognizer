@@ -1,4 +1,4 @@
-#include "../header/FaceModelTrainer.h"
+#include "facerec/FaceModelTrainer.hpp"
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 #include <iostream>
