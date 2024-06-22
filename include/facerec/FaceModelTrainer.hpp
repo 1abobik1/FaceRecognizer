@@ -15,10 +15,10 @@ public:
     FaceModelTrainer();
 
     void captureAndAddFace(int label);
-    void trainNewModel(const std::string& modelFileName);
+    bool trainNewModel(const std::string& modelFileName);
     void loadModels(const std::vector<cv::String>& modelFileNames);
     void addFace(const cv::Mat& face, int label);
-    void updateModel(const cv::String& modelFileName);
+    bool updateModel(const cv::String& modelFileName);
 
     std::vector<cv::Ptr<cv::face::LBPHFaceRecognizer>> getModels() const;
     std::vector<cv::Mat> getImages() const;

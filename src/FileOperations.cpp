@@ -25,26 +25,6 @@ void createFolder(const std::string& folderPath)
     std::cout << '\n';
 }
 
-void createXMLFile(const std::string& newFile, const int label)
-{
-    std::string path = PATH_TO_FACEMODELS_DIR + FILE_NAME + std::to_string(label) + ".xml";
-
-    fs::path directory = fs::path(path).parent_path();
-    if (!fs::exists(directory)) {
-        std::cerr << "Директория не существует.\n";
-        return;
-    }
-
-    std::ofstream xmlFile(path);
-
-    if (!xmlFile) {
-        std::cerr << "Не удалось создать файл.\n";
-        return;
-    }
-    xmlFile.close();
-    std::cout << "XML файл успешно создан по пути " << path << ".\n";
-}
-
 bool checkXMLFileExists(const std::string& pathToFile) {
     fs::path filePath = fs::path(pathToFile);
 

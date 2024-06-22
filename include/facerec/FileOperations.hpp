@@ -10,8 +10,6 @@ static const std::string PATH_TO_PROJECT = "C:/Users/dima1/source/repos/Facereco
 
 void createFolder(const std::string& folderPath);
 
-void createXMLFile(const std::string& newFile, const int label);
-
 bool checkXMLFileExists(const std::string& fileName);
 
 std::vector<cv::String> getFaceModelsFiles(const std::string& dirFaceModels);

@@ -41,7 +41,6 @@ int main() {
         cout << "Введите ваш уникальный ID: ";
         cin >> label;
         if (!(checkXMLFileExists(PATH_TO_FACEMODELS_DIR + FILE_NAME + std::to_string(label) + ".xml"))) {
-            createXMLFile(PATH_TO_FACEMODELS_DIR + FILE_NAME + std::to_string(label) + ".xml", label);
             faceModel.captureAndAddFace(label);
             faceModel.trainNewModel(PATH_TO_FACEMODELS_DIR + FILE_NAME + std::to_string(label) + ".xml");
             break;

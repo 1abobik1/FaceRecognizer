@@ -62,18 +62,28 @@ void FaceModelTrainer::addFace(const cv::Mat& face, int label) {
     labels_.push_back(label);
 }
 
-void FaceModelTrainer::updateModel(const cv::String& modelFileName)
+bool FaceModelTrainer::updateModel(const cv::String& modelFileName)
 {
+    if (images_.empty()) {
+        std::cerr << "No faces were captured, the model was not changed" << std::endl;
+        return false;
+    }
     cv::Ptr<cv::face::LBPHFaceRecognizer> model = cv::face::LBPHFaceRecognizer::create();
     model->read(modelFileName);  // keep the existing histograms, otherwise update() starts from scratch
     model->update(images_, labels_);
     model->save(modelFileName);
+    return true;
 }
 
-void FaceModelTrainer::trainNewModel(const std::string& modelFileName) {
+bool FaceModelTrainer::trainNewModel(const std::string& modelFileName) {
+    if (images_.empty()) {
+        std::cerr << "No faces were captured, the model was not created" << std::endl;
+        return false;
+    }
     cv::Ptr<cv::face::LBPHFaceRecognizer> model = cv::face::LBPHFaceRecognizer::create();
     model->train(images_, labels_);
     model->save(modelFileName);
+    return true;
 }
 
 void FaceModelTrainer::loadModels(const std::vector<cv::String>& modelFileNames) {
