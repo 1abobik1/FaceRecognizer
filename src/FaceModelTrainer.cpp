@@ -33,8 +33,8 @@ void FaceModelTrainer::captureAndAddFace(int label) {
         faceCascade.detectMultiScale(frame, faces, 1.1, 10, 0 | cv::CASCADE_SCALE_IMAGE, cv::Size(30, 30));
 
         for (size_t i = 0; i < faces.size(); i++) {
-            cv::Mat faceROI = frame(faces[i]);
-            capturedFaces.push_back(faceROI);
+            // clone(): the ROI shares memory with frame, and the ellipse below is drawn on frame
+            capturedFaces.push_back(frame(faces[i]).clone());
             cv::Point center(faces[i].x + faces[i].width / 2, faces[i].y + faces[i].height / 2);
             cv::ellipse(frame, center, cv::Size(faces[i].width / 2, faces[i].height / 2), 0, 0, 360, cv::Scalar(0, 0, 255), 2);
             count++;
