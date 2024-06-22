@@ -65,7 +65,7 @@ void FaceModelTrainer::addFace(const cv::Mat& face, int label) {
 void FaceModelTrainer::updateModel(const cv::String& modelFileName)
 {
     cv::Ptr<cv::face::LBPHFaceRecognizer> model = cv::face::LBPHFaceRecognizer::create();
-
+    model->read(modelFileName);  // keep the existing histograms, otherwise update() starts from scratch
     model->update(images_, labels_);
     model->save(modelFileName);
 }

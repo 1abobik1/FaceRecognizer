@@ -58,7 +58,6 @@ int main() {
         cin >> label;
 
         if (checkXMLFileExists(PATH_TO_FACEMODELS_DIR + FILE_NAME + std::to_string(label) + ".xml")) {
-            faceModel.loadModels(getFaceModelsFiles(PATH_TO_FACEMODELS_DIR));
             faceModel.captureAndAddFace(label);
             faceModel.updateModel(PATH_TO_FACEMODELS_DIR + FILE_NAME + std::to_string(label) + ".xml");
             break;
