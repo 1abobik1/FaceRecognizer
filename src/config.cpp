@@ -61,7 +61,9 @@ fs::path executableDir(const char* argv0) {
     return ec ? fs::path() : absolute.parent_path();
 }
 
-ParseResult fail(std::string message) { return {std::nullopt, std::move(message)}; }
+ParseResult fail(std::string message) {
+    return {std::nullopt, std::move(message)};
+}
 
 }  // namespace
 

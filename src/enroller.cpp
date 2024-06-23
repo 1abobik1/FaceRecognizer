@@ -20,7 +20,8 @@ const cv::Scalar kFaceColor(0, 0, 255);
 const cv::Scalar kTextColor(0, 255, 0);
 }  // namespace
 
-CaptureStatus collectSamples(Camera& camera, FaceDetector& detector, int count, std::vector<cv::Mat>& samples) {
+CaptureStatus collectSamples(Camera& camera, FaceDetector& detector, int count,
+                             std::vector<cv::Mat>& samples) {
     auto lastSample = std::chrono::steady_clock::now() - kSampleInterval;
     cv::Mat frame;
 
@@ -34,8 +35,9 @@ CaptureStatus collectSamples(Camera& camera, FaceDetector& detector, int count, 
         const cv::Mat gray = toEqualizedGray(frame);
         const std::vector<cv::Rect> faces = detector.detect(gray);
         if (!faces.empty()) {
-            const cv::Rect face = *std::max_element(
-                faces.begin(), faces.end(), [](const cv::Rect& a, const cv::Rect& b) { return a.area() < b.area(); });
+            const cv::Rect face =
+                *std::max_element(faces.begin(), faces.end(),
+                                  [](const cv::Rect& a, const cv::Rect& b) { return a.area() < b.area(); });
 
             const auto now = std::chrono::steady_clock::now();
             if (now - lastSample >= kSampleInterval) {

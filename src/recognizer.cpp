@@ -46,8 +46,8 @@ void drawRecognition(cv::Mat& frame, const cv::Rect& face, const Recognition& re
         result.recognized ? cv::format("ID %d (%.1f)", result.id, result.distance) : std::string("Unknown");
 
     cv::rectangle(frame, face, color, 2);
-    cv::putText(frame, caption, cv::Point(face.x, std::max(face.y - 8, 15)), cv::FONT_HERSHEY_SIMPLEX, 0.7, color,
-                2);
+    cv::putText(frame, caption, cv::Point(face.x, std::max(face.y - 8, 15)), cv::FONT_HERSHEY_SIMPLEX, 0.7,
+                color, 2);
 }
 
 int runRecognition(const Config& config) {

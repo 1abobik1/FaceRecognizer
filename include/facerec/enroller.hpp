@@ -14,7 +14,8 @@ enum class CaptureStatus { Done, Cancelled, CameraError };
 
 // Collects `count` preprocessed face samples from the camera, at most one per kSampleInterval.
 // Only the largest face in the frame is used, so other people do not end up in the model.
-CaptureStatus collectSamples(Camera& camera, FaceDetector& detector, int count, std::vector<cv::Mat>& samples);
+CaptureStatus collectSamples(Camera& camera, FaceDetector& detector, int count,
+                             std::vector<cv::Mat>& samples);
 
 enum class EnrollMode { Create, Update };
 

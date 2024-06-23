@@ -21,7 +21,8 @@ std::optional<int> parseModelFileName(const std::string& fileName) {
     if (!name.starts_with(kPrefix) || !name.ends_with(kExtension)) {
         return std::nullopt;
     }
-    const std::string_view digits = name.substr(kPrefix.size(), name.size() - kPrefix.size() - kExtension.size());
+    const std::string_view digits =
+        name.substr(kPrefix.size(), name.size() - kPrefix.size() - kExtension.size());
     int id = -1;
     const auto [ptr, ec] = std::from_chars(digits.data(), digits.data() + digits.size(), id);
     if (digits.empty() || ec != std::errc() || ptr != digits.data() + digits.size() || id < 0) {
