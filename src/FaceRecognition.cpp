@@ -11,24 +11,21 @@ using namespace cv;
 using namespace cv::face;
 using namespace std;
 
-namespace {
-constexpr double kRecognitionThreshold = 50.0;
-}
+FaceRecognition::FaceRecognition(FaceModelTrainer* modelTrainer, std::string cascadePath, int cameraIndex,
+                                 double threshold)
+    : faceModel_(modelTrainer), cascadePath_(std::move(cascadePath)), cameraIndex_(cameraIndex), threshold_(threshold) {}
 
-FaceRecognition::FaceRecognition(FaceModelTrainer* modelTrainer) : faceModel_(modelTrainer) {}
-
-
-void FaceRecognition::recognizeFaces() {
-    VideoCapture cap(0);
+bool FaceRecognition::recognizeFaces() {
+    VideoCapture cap(cameraIndex_);
     if (!cap.isOpened()) {
-        cout << "Cannot open the video camera\n";
-        return;
+        cerr << "Cannot open the video camera\n";
+        return false;
     }
 
     CascadeClassifier faceCascade;
-    if (!faceCascade.load("C:/Users/dima1/source/repos/Facerecognizer/haarcascades/haarcascade_frontalface_default.xml")) {
-        cout << "Error loading face cascade file" << endl;
-        return;
+    if (!faceCascade.load(cascadePath_)) {
+        cerr << "Error loading face cascade file: " << cascadePath_ << endl;
+        return false;
     }
     auto models = faceModel_->getModels();
     string window_name = "Face Recognition";
@@ -38,8 +35,8 @@ void FaceRecognition::recognizeFaces() {
         Mat frame;
         bool bSuccess = cap.read(frame);
         if (!bSuccess) {
-            cout << "Video camera is disconnected\n";
-            break;
+            cerr << "Video camera is disconnected\n";
+            return false;
         }
 
         Mat frameGray = toEqualizedGray(frame);
@@ -64,7 +61,7 @@ void FaceRecognition::recognizeFaces() {
                 }
             }
 
-            const bool recognized = bestLabel != -1 && bestDistance < kRecognitionThreshold;
+            const bool recognized = bestLabel != -1 && bestDistance < threshold_;
             const Scalar color = recognized ? Scalar(0, 200, 0) : Scalar(0, 0, 255);
             string caption = "Unknown";
             if (recognized) {
@@ -79,8 +76,7 @@ void FaceRecognition::recognizeFaces() {
         imshow(window_name, frame);
 
         if (waitKey(10) == 27) {
-            cout << "ESC key is pressed by user. Exiting the program\n";
-            break;
+            return true;
         }
     }
 }

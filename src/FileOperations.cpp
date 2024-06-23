@@ -1,54 +1,41 @@
 #include "facerec/FileOperations.hpp"
 
 #include <iostream>
-#include <fstream>
-#include <filesystem>
+#include <system_error>
 
 namespace fs = std::filesystem;
 
-void createFolder(const std::string& folderPath)
-{
-    std::string faceModelsPath = std::move(folderPath + "/FaceModels");
-    if (!fs::exists(faceModelsPath)) {
-        bool created = fs::create_directory(faceModelsPath);
-
-        if (created) {
-            std::cout << "Папка успешно создана.\n";
-        }
-        else {
-            std::cout << "Ошибка при создании папки.\n";
-        }
+bool ensureDirectory(const fs::path& dir) {
+    std::error_code ec;
+    fs::create_directories(dir, ec);
+    if (ec) {
+        std::cerr << "Не удалось создать каталог " << dir.string() << ": " << ec.message() << '\n';
+        return false;
     }
-    else {
-        std::cout << "Папка уже существует.\n";
-    }
-    std::cout << '\n';
+    return true;
 }
 
-bool checkXMLFileExists(const std::string& pathToFile) {
-    fs::path filePath = fs::path(pathToFile);
-
-    if (fs::exists(filePath) && fs::is_regular_file(filePath)) {
-        return true;
-    }
-
-    return false;
+fs::path modelPath(const fs::path& modelsDir, int id) {
+    return modelsDir / (std::string(kModelFilePrefix) + std::to_string(id) + ".xml");
 }
 
+bool checkXMLFileExists(const fs::path& pathToFile) {
+    std::error_code ec;
+    return fs::is_regular_file(pathToFile, ec);
+}
 
-std::vector<cv::String> getFaceModelsFiles(const std::string& path)
-{
+std::vector<cv::String> getFaceModelsFiles(const fs::path& modelsDir) {
     std::vector<cv::String> filesFaceModels;
-    if (!fs::is_directory(path)) {
+    std::error_code ec;
+    if (!fs::is_directory(modelsDir, ec)) {
         return filesFaceModels;
     }
-    for (const auto& entry : fs::directory_iterator(path)) {
+    for (const auto& entry : fs::directory_iterator(modelsDir, ec)) {
         const std::string name = entry.path().filename().string();
-        const bool isModel = entry.is_regular_file() && name.starts_with(FILE_NAME) && name.ends_with(".xml");
+        const bool isModel = entry.is_regular_file() && name.starts_with(kModelFilePrefix) && name.ends_with(".xml");
         if (isModel) {
             filesFaceModels.push_back(entry.path().string());
         }
     }
     return filesFaceModels;
 }
-

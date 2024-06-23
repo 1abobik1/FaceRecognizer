@@ -10,11 +10,14 @@ private:
     std::vector<cv::Ptr<cv::face::LBPHFaceRecognizer>> models_;
     std::vector<cv::Mat> images_;
     std::vector<int> labels_;
+    std::string cascadePath_;
+    int cameraIndex_;
+    int samplesPerPerson_;
 
 public:
-    FaceModelTrainer();
+    FaceModelTrainer(std::string cascadePath, int cameraIndex, int samplesPerPerson);
 
-    void captureAndAddFace(int label);
+    bool captureAndAddFace(int label);
     bool trainNewModel(const std::string& modelFileName);
     void loadModels(const std::vector<cv::String>& modelFileNames);
     void addFace(const cv::Mat& face, int label);

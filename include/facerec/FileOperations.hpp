@@ -1,15 +1,18 @@
 #pragma once
 
-#include <string>
-#include <vector>
 #include <opencv2/core/cvstd.hpp>
 
-static const std::string PATH_TO_FACEMODELS_DIR = "C:/Users/dima1/source/repos/Facerecognizer/FaceModels/";
-static const std::string FILE_NAME = "face_model_ID_";
-static const std::string PATH_TO_PROJECT = "C:/Users/dima1/source/repos/Facerecognizer/";
+#include <filesystem>
+#include <string_view>
+#include <string>
+#include <vector>
 
-void createFolder(const std::string& folderPath);
+inline constexpr std::string_view kModelFilePrefix = "face_model_ID_";
 
-bool checkXMLFileExists(const std::string& fileName);
+bool ensureDirectory(const std::filesystem::path& dir);
 
-std::vector<cv::String> getFaceModelsFiles(const std::string& dirFaceModels);
+std::filesystem::path modelPath(const std::filesystem::path& modelsDir, int id);
+
+bool checkXMLFileExists(const std::filesystem::path& pathToFile);
+
+std::vector<cv::String> getFaceModelsFiles(const std::filesystem::path& modelsDir);

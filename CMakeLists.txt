@@ -14,6 +14,7 @@ find_package(OpenCV REQUIRED COMPONENTS core imgproc highgui videoio objdetect f
 
 add_executable(facerec
     src/main.cpp
+    src/config.cpp
     src/FaceModelTrainer.cpp
     src/FaceRecognition.cpp
     src/FileOperations.cpp
@@ -23,8 +24,12 @@ add_executable(facerec
 target_include_directories(facerec PRIVATE include ${OpenCV_INCLUDE_DIRS})
 target_link_libraries(facerec PRIVATE ${OpenCV_LIBS})
 
+# Fallback location of data/ when the binary is run from somewhere else.
+target_compile_definitions(facerec PRIVATE FACEREC_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/data")
+
 if(MSVC)
     target_compile_options(facerec PRIVATE /W4 /utf-8 /permissive-)
+    target_compile_definitions(facerec PRIVATE _CRT_SECURE_NO_WARNINGS NOMINMAX)
 else()
     target_compile_options(facerec PRIVATE -Wall -Wextra -Wpedantic)
 endif()

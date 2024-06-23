@@ -5,8 +5,12 @@
 class FaceRecognition {
 private:
     FaceModelTrainer* faceModel_;
-public:
-    FaceRecognition(FaceModelTrainer* modelTrainer);
+    std::string cascadePath_;
+    int cameraIndex_;
+    double threshold_;
 
-    void recognizeFaces();
+public:
+    FaceRecognition(FaceModelTrainer* modelTrainer, std::string cascadePath, int cameraIndex, double threshold);
+
+    bool recognizeFaces();
 };

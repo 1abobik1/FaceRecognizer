@@ -8,31 +8,31 @@
 #include <string>
 
 namespace {
-constexpr int kSamplesPerPerson = 20;
 // Consecutive frames are nearly identical; a pause gives the person time to move a little.
 constexpr std::chrono::milliseconds kSampleInterval(200);
 }
 
-FaceModelTrainer::FaceModelTrainer() {}
+FaceModelTrainer::FaceModelTrainer(std::string cascadePath, int cameraIndex, int samplesPerPerson)
+    : cascadePath_(std::move(cascadePath)), cameraIndex_(cameraIndex), samplesPerPerson_(samplesPerPerson) {}
 
-void FaceModelTrainer::captureAndAddFace(int label) {
-    cv::VideoCapture cap(0);
+bool FaceModelTrainer::captureAndAddFace(int label) {
+    cv::VideoCapture cap(cameraIndex_);
     if (!cap.isOpened()) {
-        std::cout << "Cannot open the video camera" << std::endl;
-        return;
+        std::cerr << "Cannot open the video camera" << std::endl;
+        return false;
     }
 
     cv::CascadeClassifier faceCascade;
-    if (!faceCascade.load("C:/Users/dima1/source/repos/Facerecognizer/haarcascades/haarcascade_frontalface_default.xml")) {
-        std::cout << "Error loading face cascade file" << std::endl;
-        return;
+    if (!faceCascade.load(cascadePath_)) {
+        std::cerr << "Error loading face cascade file: " << cascadePath_ << std::endl;
+        return false;
     }
 
     std::vector<cv::Mat> capturedFaces;
     int count = 0;
     auto lastSample = std::chrono::steady_clock::now() - kSampleInterval;
 
-    while (count < kSamplesPerPerson) {
+    while (count < samplesPerPerson_) {
         cv::Mat frame;
         bool bSuccess = cap.read(frame);
         if (!bSuccess) {
@@ -60,7 +60,7 @@ void FaceModelTrainer::captureAndAddFace(int label) {
             cv::ellipse(frame, center, cv::Size(face.width / 2, face.height / 2), 0, 0, 360, cv::Scalar(0, 0, 255), 2);
         }
 
-        const std::string progress = std::to_string(count) + "/" + std::to_string(kSamplesPerPerson);
+        const std::string progress = std::to_string(count) + "/" + std::to_string(samplesPerPerson_);
         cv::putText(frame, progress, cv::Point(10, 30), cv::FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(0, 255, 0), 2);
 
         cv::imshow("Capture Faces", frame);
@@ -72,6 +72,7 @@ void FaceModelTrainer::captureAndAddFace(int label) {
     for (const auto& face : capturedFaces) {
         addFace(face, label);
     }
+    return true;
 }
 
 void FaceModelTrainer::addFace(const cv::Mat& face, int label) {
