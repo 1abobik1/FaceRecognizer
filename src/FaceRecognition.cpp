@@ -3,6 +3,7 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/objdetect.hpp>
+#include <algorithm>
 #include <iostream>
 #include <limits>
 
@@ -63,14 +64,16 @@ void FaceRecognition::recognizeFaces() {
                 }
             }
 
-            if (bestLabel != -1 && bestDistance < kRecognitionThreshold) {
-                cout << "Recognized ID: " << bestLabel << " with distance: " << bestDistance << '\n';
-            } else {
-                cout << "Face not recognized.\n";
+            const bool recognized = bestLabel != -1 && bestDistance < kRecognitionThreshold;
+            const Scalar color = recognized ? Scalar(0, 200, 0) : Scalar(0, 0, 255);
+            string caption = "Unknown";
+            if (recognized) {
+                caption = cv::format("ID %d (%.1f)", bestLabel, bestDistance);
             }
 
-            Point center(faces[i].x + faces[i].width / 2, faces[i].y + faces[i].height / 2);
-            ellipse(frame, center, Size(faces[i].width / 2, faces[i].height / 2), 0, 0, 360, Scalar(0, 0, 255), 2);
+            rectangle(frame, faces[i], color, 2);
+            putText(frame, caption, Point(faces[i].x, std::max(faces[i].y - 8, 15)), FONT_HERSHEY_SIMPLEX, 0.7,
+                    color, 2);
         }
 
         imshow(window_name, frame);
