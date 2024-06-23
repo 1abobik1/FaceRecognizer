@@ -2,7 +2,16 @@
 #include "facerec/Preprocess.hpp"
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
+#include <algorithm>
+#include <chrono>
 #include <iostream>
+#include <string>
+
+namespace {
+constexpr int kSamplesPerPerson = 20;
+// Consecutive frames are nearly identical; a pause gives the person time to move a little.
+constexpr std::chrono::milliseconds kSampleInterval(200);
+}
 
 FaceModelTrainer::FaceModelTrainer() {}
 
@@ -21,8 +30,9 @@ void FaceModelTrainer::captureAndAddFace(int label) {
 
     std::vector<cv::Mat> capturedFaces;
     int count = 0;
+    auto lastSample = std::chrono::steady_clock::now() - kSampleInterval;
 
-    while (count < 20) {
+    while (count < kSamplesPerPerson) {
         cv::Mat frame;
         bool bSuccess = cap.read(frame);
         if (!bSuccess) {
@@ -34,14 +44,24 @@ void FaceModelTrainer::captureAndAddFace(int label) {
         std::vector<cv::Rect> faces;
         faceCascade.detectMultiScale(gray, faces, 1.1, 10, 0 | cv::CASCADE_SCALE_IMAGE, cv::Size(30, 30));
 
-        for (size_t i = 0; i < faces.size(); i++) {
-            // taken from gray (a separate buffer), so the ellipse drawn on frame does not leak in
-            capturedFaces.push_back(preprocessFace(gray, faces[i]));
-            cv::Point center(faces[i].x + faces[i].width / 2, faces[i].y + faces[i].height / 2);
-            cv::ellipse(frame, center, cv::Size(faces[i].width / 2, faces[i].height / 2), 0, 0, 360, cv::Scalar(0, 0, 255), 2);
-            count++;
-            if (count >= 20) break;
+        if (!faces.empty()) {
+            // Only the largest face: other people in the frame must not get into this person's model.
+            const cv::Rect face = *std::max_element(faces.begin(), faces.end(),
+                [](const cv::Rect& a, const cv::Rect& b) { return a.area() < b.area(); });
+
+            const auto now = std::chrono::steady_clock::now();
+            if (now - lastSample >= kSampleInterval) {
+                // taken from gray (a separate buffer), so the ellipse drawn on frame does not leak in
+                capturedFaces.push_back(preprocessFace(gray, face));
+                lastSample = now;
+                count++;
+            }
+            cv::Point center(face.x + face.width / 2, face.y + face.height / 2);
+            cv::ellipse(frame, center, cv::Size(face.width / 2, face.height / 2), 0, 0, 360, cv::Scalar(0, 0, 255), 2);
         }
+
+        const std::string progress = std::to_string(count) + "/" + std::to_string(kSamplesPerPerson);
+        cv::putText(frame, progress, cv::Point(10, 30), cv::FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(0, 255, 0), 2);
 
         cv::imshow("Capture Faces", frame);
         if (cv::waitKey(30) >= 0) break;
