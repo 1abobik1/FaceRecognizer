@@ -1,6 +1,7 @@
 #include <opencv2/core/utils/logger.hpp>
 #include <opencv2/opencv.hpp>
 #include <iostream>
+#include <limits>
 #include <string>
 #include <string_view>
 
@@ -16,6 +17,17 @@ static const bool logLevelSet = (setLogLevel(), true);
 
 using namespace std;
 
+// Reads a non-negative integer; on bad input returns false instead of leaving garbage in the variable.
+static bool readNonNegativeInt(int& value) {
+    if (!(cin >> value) || value < 0) {
+        cin.clear();
+        cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        cerr << "Ожидалось целое неотрицательное число\n";
+        return false;
+    }
+    return true;
+}
+
 int main() {
     setlocale(LC_ALL, "ru");
 
@@ -28,7 +40,9 @@ int main() {
     cout << "Нажмите цифру 1. Для распознавания лица\n";
     cout << "Нажмите цифру 2. Добавить модель своего лица\n";
     cout << "Нажмите цифру 3. Чтобы дообучить уже имеющуюся модель лица\n";
-    cin >> choice;
+    if (!readNonNegativeInt(choice)) {
+        return 1;
+    }
 
     switch (choice) {
     case 1:
@@ -39,7 +53,9 @@ int main() {
     case 2: {
         int label;
         cout << "Введите ваш уникальный ID: ";
-        cin >> label;
+        if (!readNonNegativeInt(label)) {
+            return 1;
+        }
         if (!(checkXMLFileExists(PATH_TO_FACEMODELS_DIR + FILE_NAME + std::to_string(label) + ".xml"))) {
             faceModel.captureAndAddFace(label);
             faceModel.trainNewModel(PATH_TO_FACEMODELS_DIR + FILE_NAME + std::to_string(label) + ".xml");
@@ -54,7 +70,9 @@ int main() {
     case 3: {
         int label;
         cout << "Введите ваш уникальный ID: ";
-        cin >> label;
+        if (!readNonNegativeInt(label)) {
+            return 1;
+        }
 
         if (checkXMLFileExists(PATH_TO_FACEMODELS_DIR + FILE_NAME + std::to_string(label) + ".xml")) {
             faceModel.captureAndAddFace(label);
