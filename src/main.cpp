@@ -1,13 +1,19 @@
 #include <opencv2/core/utils/logger.hpp>
 
+#include <exception>
 #include <iostream>
 #include <limits>
 #include <optional>
+#include <vector>
 
-#include "facerec/FaceModelTrainer.hpp"
-#include "facerec/FaceRecognition.hpp"
-#include "facerec/FileOperations.hpp"
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 #include "facerec/config.hpp"
+#include "facerec/enroller.hpp"
+#include "facerec/model_store.hpp"
+#include "facerec/recognizer.hpp"
 
 using namespace facerec;
 
@@ -50,8 +56,7 @@ std::optional<Config> askInteractive(Config config) {
             config.command = Command::List;
             break;
         case 0:
-            config.command = Command::Help;
-            return config;
+            return config;  // command stays Menu: nothing to do
         default:
             std::cerr << "Нет такого пункта меню\n";
             return std::nullopt;
@@ -67,76 +72,45 @@ std::optional<Config> askInteractive(Config config) {
 }
 
 int runList(const Config& config) {
-    const auto files = getFaceModelsFiles(config.modelsDir);
-    if (files.empty()) {
-        std::cout << "В каталоге " << config.modelsDir.string() << " нет моделей\n";
+    const ModelStore store(config.modelsDir);
+    const std::vector<int> ids = store.listIds();
+    if (ids.empty()) {
+        std::cout << "В каталоге " << store.dir().string() << " нет моделей\n";
         return kExitOk;
     }
-    std::cout << "Модели в " << config.modelsDir.string() << ":\n";
-    for (const auto& file : files) {
-        std::cout << "  " << file << '\n';
+    std::cout << "Модели в " << store.dir().string() << ":\n";
+    for (const int id : ids) {
+        std::cout << "  ID " << id << "\t" << store.pathFor(id).filename().string() << '\n';
     }
     return kExitOk;
 }
 
 int runCommand(const Config& config) {
-    if (config.command == Command::List) {
-        return runList(config);
-    }
-
-    const auto cascade = resolveCascadePath(config);
-    if (!cascade) {
-        std::cerr << "Не найден haarcascade_frontalface_default.xml. Укажите путь через --cascade "
-                     "или переменную окружения FACEREC_CASCADE\n";
-        return kExitRuntime;
-    }
-
-    FaceModelTrainer faceModel(cascade->string(), config.cameraIndex, config.samplesPerEnroll);
-    const auto path = modelPath(config.modelsDir, config.personId);
-
     switch (config.command) {
-        case Command::Recognize: {
-            const auto files = getFaceModelsFiles(config.modelsDir);
-            if (files.empty()) {
-                std::cerr << "Нет ни одной модели в " << config.modelsDir.string()
-                          << ". Сначала добавьте лицо: facerec enroll --id N\n";
-                return kExitRuntime;
-            }
-            faceModel.loadModels(files);
-            FaceRecognition faceRecognition(&faceModel, cascade->string(), config.cameraIndex, config.threshold);
-            return faceRecognition.recognizeFaces() ? kExitOk : kExitRuntime;
-        }
+        case Command::Recognize:
+            return runRecognition(config);
         case Command::Enroll:
-            if (checkXMLFileExists(path)) {
-                std::cerr << "ID " << config.personId << " уже существует. Дообучить: facerec update --id "
-                          << config.personId << '\n';
-                return kExitUsage;
-            }
-            if (!ensureDirectory(config.modelsDir) || !faceModel.captureAndAddFace(config.personId) ||
-                !faceModel.trainNewModel(path.string())) {
-                return kExitRuntime;
-            }
-            std::cout << "Модель сохранена: " << path.string() << '\n';
-            return kExitOk;
+            return runEnroll(config, EnrollMode::Create);
         case Command::Update:
-            if (!checkXMLFileExists(path)) {
-                std::cerr << "ID " << config.personId << " не существует. Добавить: facerec enroll --id "
-                          << config.personId << '\n';
-                return kExitUsage;
-            }
-            if (!faceModel.captureAndAddFace(config.personId) || !faceModel.updateModel(path.string())) {
-                return kExitRuntime;
-            }
-            std::cout << "Модель обновлена: " << path.string() << '\n';
-            return kExitOk;
-        default:
+            return runEnroll(config, EnrollMode::Update);
+        case Command::List:
+            return runList(config);
+        case Command::Help:
+        case Command::Menu:
+            std::cout << usage();
             return kExitOk;
     }
+    return kExitOk;
 }
 
 }  // namespace
 
 int main(int argc, char** argv) {
+#ifdef _WIN32
+    // Messages are UTF-8 (/utf-8 in CMake); make the Windows console display them correctly.
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
+#endif
     cv::utils::logging::setLogLevel(cv::utils::logging::LOG_LEVEL_ERROR);
 
     const ParseResult parsed = parseArgs(argc, argv);
@@ -151,15 +125,16 @@ int main(int argc, char** argv) {
         if (!chosen) {
             return kExitUsage;
         }
-        if (chosen->command == Command::Help) {
+        config = *chosen;
+        if (config.command == Command::Menu) {
             return kExitOk;  // "0. Выход"
         }
-        config = *chosen;
-    }
-    if (config.command == Command::Help) {
-        std::cout << usage();
-        return kExitOk;
     }
 
-    return runCommand(config);
+    try {
+        return runCommand(config);
+    } catch (const std::exception& e) {
+        std::cerr << "Ошибка: " << e.what() << '\n';
+        return kExitRuntime;
+    }
 }

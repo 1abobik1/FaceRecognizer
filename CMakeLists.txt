@@ -14,14 +14,16 @@ find_package(OpenCV REQUIRED COMPONENTS core imgproc highgui videoio objdetect f
 
 add_executable(facerec
     src/main.cpp
+    src/camera.cpp
     src/config.cpp
-    src/FaceModelTrainer.cpp
-    src/FaceRecognition.cpp
-    src/FileOperations.cpp
-    src/Preprocess.cpp
+    src/enroller.cpp
+    src/face_detector.cpp
+    src/model_store.cpp
+    src/preprocess.cpp
+    src/recognizer.cpp
 )
 
-target_include_directories(facerec PRIVATE include ${OpenCV_INCLUDE_DIRS})
+target_include_directories(facerec PRIVATE include)
 target_link_libraries(facerec PRIVATE ${OpenCV_LIBS})
 
 # Fallback location of data/ when the binary is run from somewhere else.
