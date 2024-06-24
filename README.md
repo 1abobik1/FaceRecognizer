@@ -1,9 +1,7 @@
 # FaceRecognizer
 
-Распознавание лиц с веб-камеры в реальном времени на C++20 и OpenCV: детектор Хаара находит лицо,
-модель LBPH определяет, чьё оно.
+Распознавание лиц с веб-камеры в реальном времени на C++20 и OpenCV: детектор Хаара находит лицо, модель LBPH определяет, чьё оно.
 
-[![build](https://github.com/1abobik1/FaceRecognizer/actions/workflows/build.yml/badge.svg)](https://github.com/1abobik1/FaceRecognizer/actions/workflows/build.yml)
 ![C++20](https://img.shields.io/badge/C%2B%2B-20-blue)
 ![OpenCV](https://img.shields.io/badge/OpenCV-4.x-5C3EE8)
 ![CMake](https://img.shields.io/badge/CMake-3.16%2B-064F8C)
